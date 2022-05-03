@@ -1,0 +1,1 @@
+mkdir o/; mkdir bin/
