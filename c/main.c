@@ -11,29 +11,7 @@ extern int main( void ){
     irq_install_handler(1, *keyboard_handler);
     stdin = malloc(512); //beginning amount to allocate to stdin
     print("DONE\nInitializing CLIOSFS\n", 0);
-    start_disk();
-    
-    uint16_t *d;
-    kLBAread(0, 1, 0, d);
-    
-    if(*d != 1770){
-        while(*d != 1770){
-            reset_Disk();
-            kLBAread(0, 1, 0, d);
-        }
-    }
+    showOutp = 1;
+    print("Please Choose a Disk driver Type by typing the drive type [AHCI, ATA_PIO, SATA]\n", 0);
     shell_init();
-    //print("Starting Shell...\n", 0);
-    update_cursor(xpos, ypos);
-    showOutp =1;
-    past = 1;
-    kLBAwrite(0, "Hello World!\n", 0, 1);
-    uint16_t *b;
-    kLBAread(0, 1, 0, b);
-    if(!parse(b, "Hello World!")){
-        print("FAILED\n", 0);
-    }
-    else{
-        print("PASSED\n", 0);
-    }
 }

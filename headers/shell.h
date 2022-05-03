@@ -17,6 +17,13 @@ int shell_run(char *args){
     else if(parse(args, "testscreen")){
         testPrint();
     }
+    else if(parse(args, "d0")){
+        disk_mode = 0;
+    }
+    else if(parse(args, "d1")){
+        disk_mode = 1;
+        start_disk();
+    }
     print("$>", 0);
 }
 extern void reset();

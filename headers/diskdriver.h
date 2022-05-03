@@ -24,6 +24,7 @@ typedef struct file{
     int *address;
     int *caddress;
 } FILE;
+int disk_mode = 0;
 void drive_test();
 int lastDiskAddress = 0;
 char *fread(int size, FILE file){
@@ -157,6 +158,7 @@ int start_disk(void){
             return DRIVE_ERROR;
         }
     }
+    print("MODE: ATA_PIO MODE\n", 0);
     return 0;
 }
 
@@ -252,4 +254,14 @@ void Drive_Error_Handler(){
         print("Bad Block\n", 0);
     }
     return DRIVE_ERROR;
+}
+uint16_t *readDisk(int address, int secnum, char drivenum){
+    uint16_t *buffer = malloc(sizeof(short unsigned int) * 256* secnum);
+    switch(disk_mode){
+        case 0:
+            kLBAread(address, secnum, drivenum, buffer);
+            break;
+        case 1:
+            //AHCI_read
+    }
 }
