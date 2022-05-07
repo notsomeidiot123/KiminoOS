@@ -1,0 +1,16 @@
+GRAPHICS MODES:
+    0x00 is medium res
+    0x01 is lower res
+    0x02 is higher res
+    0x03 is highest res
+    VIDEO MODE:
+    0x04 and up???
+Current Resources:
+	wiki.osdev.org/ATA_PIO_Mode
+	wiki.osdev.org/Floppy_Disk_Controller
+	wiki.osdev.org/CMOS
+	wiki.osdev.org/ACPI
+	wiki.osdev.org/VGA_Hardware
+	wiki.osdev.org/Universal_Serial_Bus
+	wiki.osdev.org/PCI
+	asciitable.com
