@@ -293,3 +293,13 @@ int memcpy(void *dest, void *src, unsigned int size){
     }
     return 0;
 }
+int a20_enable(void){
+
+}
+
+/*********************
+* TEXT MODE: 0xB8000 *
+* GR.  MODE: 0xA000  *
+*********************/
+
+//IMPLEMENT STACK SMASHING PROTECTOR!!!!

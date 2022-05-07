@@ -1,5 +1,6 @@
 #include<stdint.h>
 #include "../headers/shell.h"
+extern const char a20_on;
 extern int main( void ){
     clear();
     enable_cursor(0, 15);
@@ -7,6 +8,11 @@ extern int main( void ){
     print("Boot Successful!\nLoading IDT:\t", 0);
     IDT_INIT();
     print("DONE\n", 0);
+    if(a20_on){
+        print("enabling A20 line...\t", 0);
+        a20_enable();
+        print("DONE\n", 0);
+    }
     print("Starting Keyboard Driver:\t", 0);
     irq_install_handler(1, *keyboard_handler);
     stdin = malloc(512); //beginning amount to allocate to stdin

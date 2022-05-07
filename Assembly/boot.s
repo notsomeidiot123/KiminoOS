@@ -73,10 +73,27 @@ Protectedmode:
     mov ebx, 0
     mov ecx, 0
     cmp dl, [BootDisc]
-    je KERNEL
-    jmp $
-    PPrint:
-    jmp KERNEL
+    je check_a20
 jmp $
+check_a20:
+    pushad
+    push edi
+    push esi
+    mov edi, 0x112345
+    mov esi, 0x012345
+    mov [esi], esi
+    mov [edi], edi
+    cmpsd
+    popad
+    je a20_off
+    mov byte bx, 1
+    jmp KERNEL
+    jmp $
+a20_off:
+    mov byte bx, 0
+    jmp KERNEL
+    jmp $
+jmp $
+a20_on: db 0
 times 510-($-$$) db 0
 db 0x55, 0xaa
