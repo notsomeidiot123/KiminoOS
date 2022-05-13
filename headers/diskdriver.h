@@ -263,5 +263,6 @@ uint16_t *readDisk(int address, int secnum, char drivenum){
             break;
         case 1:
             //AHCI_read
+            break;
     }
 }
