@@ -27,25 +27,25 @@ typedef struct file{
 int disk_mode = 0;
 void drive_test();
 int lastDiskAddress = 0;
-char *fread(int size, FILE file){
-    if(size > file.size){
-        size = file.size;
-    }else if(size <= 0){
-        return FILE_ERROR;
-    }
-    else if(size > 8192){
-        //prevent file data from flooding RAM
-        //ik 8kb is small, but i dont want to risk anything
-        return BUFFER_TOO_LARGE;
-    }
-    char fchar = 0;
-    //pre-check for control characters
-    char *buffer = malloc(size);
+// char *fread(int size, FILE *file){
+//     if(size > file.size){
+//         size = file.size;
+//     }else if(size <= 0){
+//         return FILE_ERROR;
+//     }
+//     else if(size > 8192){
+//         //prevent file data from flooding RAM
+//         //ik 8kb is small, but i dont want to risk anything
+//         return BUFFER_TOO_LARGE;
+//     }
+//     char fchar = 0;
+//     //pre-check for control characters
+//     char *buffer = malloc(size);
 
-    if(fchar == 0){
+//     if(fchar == 0){
 
-    }
-}
+//     }
+// }
 char *fwrite(char *data, FILE file){
 
 }
@@ -61,8 +61,8 @@ void pollDrive_BSY(char drive){
 void pollDrive_DRQ(char drive){
     while(!(inb(STATUS_REGISTER) & 0x40));
 }
-void kLBAread(int address, int size, char driveNum, uint16_t *buffer);
-void kLBAwrite(int address, char *data, char driveNum, int sec_count);
+char kLBAread(int address, int size, char driveNum, uint16_t *buffer);
+char kLBAwrite(int address, char *data, char driveNum, int sec_count);
 
 //0 for hard drive, 1 for SSD
 char drive_type = 0;
@@ -74,15 +74,11 @@ void reset_Disk(){
 }
 int AHCI_Drive();
 int start_disk(void){
-    print("Starting Disk...\t", 0);
     int status = inb(STATUS_REGISTER);
     if(status == 0xff){
-        print("FAILED\nNo Drive Connected!\n", 0);
     }
     else if(status & 0x80){
-        print("Waiting for drive...\t", 0);
         while (inb(STATUS_REGISTER) & 0x80);
-        print("Done\n", 0);
     }
     //identify drive
     outb(DRIVE_SELECT, 0xA0);
@@ -92,7 +88,7 @@ int start_disk(void){
     outb(CYLINDER_HIGH,0);
     outb(STATUS_REGISTER, 0xEC);
     if(inb(STATUS_REGISTER) == 0x00){
-        print("FAILED\nNo Drive Connected!\n", 0);
+        return DRIVE_ERROR;
     }
     else{
         while(inb(STATUS_REGISTER) & 0x80){
@@ -102,42 +98,34 @@ int start_disk(void){
                 break;
             }
             else if(inb(STATUS_REGISTER) & 0x01){
-                print("FAILED\nNo Drive Connected!\n", 0);
+                break;
             }
             else if(inb(STATUS_REGISTER) & 4){
-                print("Testing...\t", 0);
+                continue;
             }
         }
     }
     int cylow = inb(CYLINDER_LOW);
     int cyhigh = inb(CYLINDER_HIGH);
     if(cylow == 0x14 && cyhigh == 0xeb || cylow == 0x3c && cyhigh == 0xc3){
-        print("Unsupported Drive type\n", 0);
         return 1;
     }
     else if(cylow == 0 && cyhigh == 0 && inb(STATUS_REGISTER) & 1){
-        print("Error Reading Disk\n", 0);
         return 1;
     }
     else{
         int status = inb(STATUS_REGISTER);
         if(status & 1 || inb(ERROR_REGISTER)){
             //software reset
-            print("Resetting...\t", 0);
             outb(COMMAND_REGISTER, 0x08);
-            print("Done\n", 0);
         }
         if(status & 32){
-            print("Resetting...\t", 0);
             outb(COMMAND_REGISTER, 0x08);
-            print("Done\n", 0);
         }
         outb(DRIVE_SELECT, inb(DRIVE_SELECT) | 0x40);
         if(inb(ERROR_REGISTER)){
-            print("Error Reading Disk\n", 0);
             return DRIVE_ERROR;
         }
-        print("Disk Started\n",0);
         uint16_t *data_buffer = (uint16_t*)malloc(sizeof(uint16_t) * 256);
         uint16_t *start = data_buffer;
         for(int i = 0; i < 256; i++){
@@ -148,34 +136,26 @@ int start_disk(void){
         }
         if(data_buffer[83] & 0x200){
             Address_Mode = 2;
-            print("LBA48 Detected\n", 0);
         }
         if(data_buffer[60] && data_buffer[61]){
             Address_Mode = 1; //supports LBA addressing mode
         }
         if(inb(ERROR_REGISTER)){
-            print("Disk Error\n", 0);
             return DRIVE_ERROR;
         }
     }
-    print("MODE: ATA_PIO MODE\n", 0);
     return 0;
 }
 
 int AHCI_Drive(){
-    print("Currently Not Supported\n", 0);
-    print("Please use a non-AHCI drive\n", 0);
-    print("R/W to the drive will not work\n", 0);
-    print("AHCI drives support will begin in v0.5-alpha\n", 0);
 }
 
 void drive_test(registers *regs){
-    print("Disk Interrupt\n", 0);
 }
 //sector mus be < 1
 
 void Drive_Error_Handler();
-void kLBAwrite(int address, char *data, char driveNum, int sec_count){
+char kLBAwrite(int address, char *data, char driveNum, int sec_count){
     pollDrive_BSY(driveNum);
     Drive_Error_Handler();
     outb(DRIVE_SELECT, 0xE0 | driveNum <<4 | (address >>24) & 0xF);//output drive data in LBA format, one byte at a time
@@ -195,15 +175,15 @@ void kLBAwrite(int address, char *data, char driveNum, int sec_count){
     }
     int status = inb(STATUS_REGISTER);
     if(status & 1){
-        print("Error Reading Disk\n", 0);
+        return DRIVE_ERROR;
     }
     else if(status & 32){
-        print("Error Reading Disk\n", 0);
+        return DRIVE_ERROR;
     }
     outb(COMMAND_REGISTER, 0xE7);
     Drive_Error_Handler();
 }
-void kLBAread(int address, int size, char driveNum, uint16_t *bufferADdr){
+char kLBAread(int address, int size, char driveNum, uint16_t *bufferADdr){
     //check status
     pollDrive_BSY(driveNum);
     //read data
@@ -224,35 +204,13 @@ void kLBAread(int address, int size, char driveNum, uint16_t *bufferADdr){
     Drive_Error_Handler();
     int status = inb(STATUS_REGISTER);
     if(status & 1){
-        print("Error Reading Disk\n", 0);
+        return DRIVE_ERROR;
     }
     else if(status & 32){
-        print("Error Reading Disk\n", 0);
+        return DRIVE_ERROR;
     }
 }
 void Drive_Error_Handler(){
-    char err = inb(ERROR_REGISTER);
-    if(err & 1){
-        print("Address mark not found\n", 0);
-    }
-    if(err & 2){
-        print("Track zero not found\n", 0);
-    }
-    if(err & 4){
-        print("Aborted command\n", 0);
-    }
-    if(err & 8){
-        print("Media change request\n", 0);
-    }
-    if(err & 16){
-        print("ID not found\n", 0);
-    }
-    if(err & 32){
-        print("Uncorrectable data error\n", 0);
-    }
-    if(err & 64){
-        print("Bad Block\n", 0);
-    }
     return DRIVE_ERROR;
 }
 uint16_t *readDisk(int address, int secnum, char drivenum){

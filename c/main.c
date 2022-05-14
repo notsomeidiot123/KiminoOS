@@ -1,28 +1,9 @@
 #include<stdint.h>
 #include "../headers/shell.h"
+#include "../headers/vga_driver.h"
 extern const char a20_on;
 extern int main( void ){
-    char *vga_test = (char*)0xa0000;
-    int ind = 0;
-    char square[8][8] = {
-        {0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf}, 
-        {0xf, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xf}, 
-        {0xf, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xf},
-        {0xf, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xf}, 
-        {0xf, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xf}, 
-        {0xf, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xf}, 
-        {0xf, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xf},  
-        {0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf}
-        };
-    wait(15);
-    char color = 0;
-    for( int x = 0; x < 8; x++){
-        for(int y = 0; y < 8; y++){
-            if(square[x][y]){
-                put(x, y, square[x][y]);
-            }
-        }
-    }
+    
     //320x200 256 color
     //make a graphics library, after I finish with AHCI drives
     /*clear();
@@ -43,8 +24,7 @@ extern int main( void ){
     showOutp = 1;
     print("Please Choose a Disk driver Type by typing the drive type [AHCI, ATA_PIO, SATA]\n", 0);
     shell_init();*/
-}
-void put(int x, int y, char color){
-    char * loc  = (char*)0xa0000 + 320 * y + x;
-    *loc = color;
+    for(int i = 0; i < 7; i++){
+        testp(' '+ i, i * 200/16, 0);
+    }
 }
