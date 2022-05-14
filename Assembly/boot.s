@@ -20,7 +20,7 @@ Set_Stack:
     mov sp, 0x8000
 Boot:
     mov ah, 0x00
-    mov al, 0x03
+    mov al, 0x13
     int 10h
     mov bx, 0
     ;read from disk, 128 sectors
