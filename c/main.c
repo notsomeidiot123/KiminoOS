@@ -11,7 +11,7 @@ extern int main( void ){
     print("Boot Successful!\nLoading IDT:\t", 0);
     IDT_INIT();
     print("DONE\n", 0);
-    if(a20_on){
+    if(a20_on){ 
         print("enabling A20 line...\t", 0);
         a20_enable();
         print("DONE\n", 0);

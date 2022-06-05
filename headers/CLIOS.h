@@ -297,6 +297,19 @@ int a20_enable(void){
 
 }
 
+int strlen(char *ptr){
+    char *base = ptr;
+    int len = 0;
+    while(*ptr++) len++;
+    return len;
+}
+
+void strcpy(char* src, char* dest){
+    //this would probably cause a segfault on a linux/windows machine
+    while(*src){
+        *dest++ = *src++;
+    }
+}
 /*********************
 * TEXT MODE: 0xB8000 *
 * GR.  MODE: 0xA000  *

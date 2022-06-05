@@ -165,12 +165,18 @@ char kLBAwrite(int address, char *data, char driveNum, int sec_count){
     outb(CYLINDER_LOW, (unsigned char) (address >>8));
     outb(CYLINDER_HIGH, (unsigned char) (address >>16));
     outb(COMMAND_REGISTER, 0x30);
+    char *toWrite = malloc(512 * sec_count);
+    if(strlen(data) % 512 > 0){
+        kLBAread(address, 512 * sec_count, driveNum, toWrite);
+        strcpy(data, toWrite);
+    }
     for(int i = 0; i < sec_count + 1; i++){
         pollDrive_BSY(driveNum);
         pollDrive_DRQ(driveNum);
         for(int j = 0; j < 256; j++){
-            uint16_t toOut = *data++ | (*data++ << 8);
+            uint16_t toOut = *toWrite++ | (*toWrite << 8);
             outw(DATA_REGISTER, toOut);
+            data++;
         }
     }
     int status = inb(STATUS_REGISTER);
@@ -180,7 +186,7 @@ char kLBAwrite(int address, char *data, char driveNum, int sec_count){
     else if(status & 32){
         return DRIVE_ERROR;
     }
-    outb(COMMAND_REGISTER, 0xE7);
+    outb(COMMAND_REGISTER, 0xE7); // clear buffer
     Drive_Error_Handler();
 }
 char kLBAread(int address, int size, char driveNum, uint16_t *bufferADdr){

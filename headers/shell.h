@@ -24,6 +24,10 @@ int shell_run(char *args){
         disk_mode = 1;
         start_disk();
     }
+    else if(parse(args, "testDisk")){
+        print("Testing...\n", 0);
+        kLBAwrite(0, "TEST", 0, 1);
+    }
     print("$>", 0);
 }
 extern void reset();
