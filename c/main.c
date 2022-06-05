@@ -24,7 +24,12 @@ extern int main( void ){
     showOutp = 1;
     print("Please Choose a Disk driver Type by typing the drive type [AHCI, ATA_PIO, SATA]\n", 0);
     shell_init();*/
-    for(int i = 0; i < 7; i++){
-        testp(' '+ i, i * 200/16, 0);
-    }
+    putpx(0, 0, 0, 0xff);
+    putpx(0, 1, 0, 0b11000011);
+    putpx(0, 2, 0, 0b11000011);
+    putpx(0, 3, 0, 0b11000011);
+    putpx(0,4,0,0b11000011);
+    putpx(0, 5, 0, 0b11000011);
+    putpx(0, 6, 0, 0b11000011);
+    putpx(0, 7, 0, 0xff);
 }
