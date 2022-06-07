@@ -169,25 +169,9 @@ int clear(void){
 }
 char *malloc(int size);
 int printdc(int num){
-    int tmp = num;
-    int size = 0;
-    while(tmp > 0){
-        tmp /= 10;
-        index++;
-        size++;
+    while(num >= 0){
+        
     }
-    size -= 1;
-    index -= 1;
-    while(num > 0){
-        vga_framebuffer[index--] = (num % 10) + '0'| WHITE << 8;
-        num /= 10;
-        if(index % _RESX == 0){
-            ypos++;
-        }
-    }
-    index += size + 2;
-    xpos = index % _RESX;
-    update_cursor(xpos, ypos);
 }
 int freemem = 0x100000;
 char* malloc(int size){
@@ -208,7 +192,10 @@ char *inmalloc(int size, int initializer){
     freemem += size;
     return address;
 }
-char* free(int size){freemem -= size;}
+char* free(int size){
+    freemem -= size;
+    return null
+}
 char* clearmem(int size){
     unsigned int* dest = (unsigned int*)size;
     freemem -= size;

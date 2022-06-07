@@ -153,7 +153,9 @@ int AHCI_Drive(){
 void drive_test(registers *regs){
 }
 //sector mus be < 1
-
+//I MIGHT HAVE TO RE-WRITE LIKE 300 LINES OF CODE
+//BECAUSE IM DUMB AND CHOSE ATA OVER AHCI
+//AHCI IS SO MUCH BETTERRRR
 void Drive_Error_Handler();
 char kLBAwrite(int address, char *data, char driveNum, int sec_count){
     pollDrive_BSY(driveNum);
@@ -220,7 +222,7 @@ void Drive_Error_Handler(){
     return DRIVE_ERROR;
 }
 uint16_t *readDisk(int address, int secnum, char drivenum){
-    uint16_t *buffer = malloc(sizeof(short unsigned int) * 256* secnum);
+    uint16_t *buffer = malloc(sizeof(uint16_t) * 256* secnum);
     switch(disk_mode){
         case 0:
             kLBAread(address, secnum, drivenum, buffer);
@@ -229,4 +231,5 @@ uint16_t *readDisk(int address, int secnum, char drivenum){
             //AHCI_read
             break;
     }
+    return buffer;
 }
