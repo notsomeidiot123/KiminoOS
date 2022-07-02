@@ -158,27 +158,24 @@ void drive_test(registers *regs){
 //AHCI IS SO MUCH BETTERRRR
 void Drive_Error_Handler();
 char kLBAwrite(int address, char *data, char driveNum, int sec_count){
+    uint16_t *toWrite = malloc(512 * sec_count);
+    kLBAread(address, sec_count, driveNum, toWrite);
+    printdc(*toWrite);
     pollDrive_BSY(driveNum);
     Drive_Error_Handler();
     outb(DRIVE_SELECT, 0xE0 | driveNum <<4 | (address >>24) & 0xF);//output drive data in LBA format, one byte at a time
     outb(ERROR_REGISTER, 0);
-    outb(SECTOR_COUNT, sec_count + 1); //how many seectors to read
+    outb(SECTOR_COUNT, sec_count); //how many seectors to read
     outb(SECTOR_NUMBER, (unsigned char) address); 
     outb(CYLINDER_LOW, (unsigned char) (address >>8));
     outb(CYLINDER_HIGH, (unsigned char) (address >>16));
     outb(COMMAND_REGISTER, 0x30);
-    char *toWrite = malloc(512 * sec_count);
-    if(strlen(data) % 512 > 0){
-        kLBAread(address, 512 * sec_count, driveNum, toWrite);
-        strcpy(data, toWrite);
-    }
+    strcpy(data, toWrite);
     for(int i = 0; i < sec_count + 1; i++){
         pollDrive_BSY(driveNum);
         pollDrive_DRQ(driveNum);
         for(int j = 0; j < 256; j++){
-            uint16_t toOut = *toWrite++ | (*toWrite << 8);
-            outw(DATA_REGISTER, toOut);
-            data++;
+            outw(DATA_REGISTER, *toWrite++| *toWrite++ << 8);
         }
     }
     int status = inb(STATUS_REGISTER);

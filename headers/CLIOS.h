@@ -168,10 +168,24 @@ int clear(void){
     }
 }
 char *malloc(int size);
+char *free(int size);
 int printdc(int num){
-    while(num >= 0){
-        
-    }
+    int tmpn = num;
+    char *buffer = malloc(512);
+    char *base = buffer;
+    *buffer = 0;
+    do{
+        *(buffer++) = tmpn % 10 + 48;
+        tmpn /= 10;
+    }while(tmpn > 0);
+    do{
+        char *tmp = malloc(2);
+        *tmp = *(buffer--);
+        *(tmp+1) = 0;
+        print(tmp, 0);
+        num /= 10;
+        tmp = free(2);
+    }while(*buffer);
 }
 int freemem = 0x100000;
 char* malloc(int size){
@@ -194,7 +208,7 @@ char *inmalloc(int size, int initializer){
 }
 char* free(int size){
     freemem -= size;
-    return null
+    return null;
 }
 char* clearmem(int size){
     unsigned int* dest = (unsigned int*)size;

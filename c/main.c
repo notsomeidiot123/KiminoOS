@@ -21,6 +21,5 @@ extern int main( void ){
     stdin = malloc(512); //beginning amount to allocate to stdin
     print("DONE\nInitializing CLIOSFS\n", 0);
     showOutp = 1;
-    print("Please Choose a Disk driver Type by typing the drive type [AHCI, ATA_PIO, SATA]\n", 0);
     shell_init();
 }
