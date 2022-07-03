@@ -16,7 +16,21 @@ detect_mem:
     error:
         mov byte di, 0
         mov byte [es:di], 0xff;
+        mov bx, errormsg
+        call prints
         jmp $
     return:
-    popad
-    ret
+        popad
+        ret
+errormsg: db "Failed to get size of memory, please restart your computer", 10, 13, 0
+prints:
+    mov ah, 0x0e
+    prloop:
+        cmp byte [bx], 0
+        jz endpr
+        mov al, [bx]
+        inc bx
+        int 10h
+        jmp prloop
+    endpr:
+        ret

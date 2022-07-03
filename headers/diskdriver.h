@@ -159,11 +159,7 @@ void drive_test(registers *regs){
 void Drive_Error_Handler();
 char kLBAwrite(int address, char *data, char driveNum, int sec_count){
     uint16_t *toWrite = malloc(512 * sec_count);
-    loopback:
     kLBAread(address, sec_count, driveNum, toWrite);
-    if(*toWrite == 0){
-        goto loopback;
-    }
     pollDrive_BSY(driveNum);
     Drive_Error_Handler();
     outb(DRIVE_SELECT, 0xE0 | driveNum <<4 | (address >>24) & 0xF);//output drive data in LBA format, one byte at a time
