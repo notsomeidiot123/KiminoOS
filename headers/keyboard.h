@@ -26,6 +26,7 @@ char showOutp = 0;
 int stdindex = 0;
 char *stdin = 0;
 char run = 0;
+char ctrlpressed = 0;
 void keyboard_handler(registers *r){
     unsigned char scancode = inb(0x60);
     if(scancode > 0x80){
@@ -36,9 +37,14 @@ void keyboard_handler(registers *r){
             case 0xb6:
                 shiftpressed = 0;
                 break;
+            case 0x9d:
+                ctrlpressed = 0;
         }
     }else{
         switch(scancode){
+            case 0x1d:
+                ctrlpressed = 1;
+                break;
             case 0x36:
                 shiftpressed = 1;
                 break;
@@ -60,15 +66,30 @@ void keyboard_handler(registers *r){
                 break;
             case 0xe:
                 if(stdindex > 0){
-                    stdin[stdindex--] = 0;
-                    delkey();
+                    if(ctrlpressed){
+                        while(stdin[stdindex] != ' ' || stdin[stdindex] != 0 || stdindex != 0){
+                            stdin[stdindex--] = 0;
+                            delkey();
+                            if(stdin[stdindex] == ' ' || stdin[stdindex] == 0 || stdindex == 0) break;
+                        }
+                    }
+                    else{
+                        stdin[stdindex--] = 0;
+                        delkey();
+                    }
                 }
                 break;
             default:
              if(showOutp){
                 if(shiftpressed){
                     char tstdin = stdincodes[scancode];
-                    stdin[stdindex++] = tstdin - 32;
+                    if(tstdin = '\''){
+                        tstdin = '\"';
+                        stdin[stdindex++] = tstdin;
+                    }
+                    else{
+                        stdin[stdindex++] = tstdin - 32;
+                    }
                 }
                 else{
                     stdin[stdindex++] = stdincodes[scancode];

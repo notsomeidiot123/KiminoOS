@@ -126,6 +126,13 @@ int print(const char *str, char caps){
         }
         if(caps && *str < 123 && *str > 96){
             vga_framebuffer[index++] = (*str++ - 32) | WHITE << 8;
+            continue;
+        }
+        else if(caps){
+            if(*str == '\''){
+                vga_framebuffer[index++] = '\"' | WHITE << 8;
+            }
+            continue;
         }
         else{
             vga_framebuffer[index++] = *str++ | WHITE << 8;
@@ -261,7 +268,22 @@ int wait(int time){
     return 0;
 }
 
-int pow(int base, int exp){
+float f_pow(int base, int exp){
+    float res = 1;
+    if(exp < 0){
+        float negativeres = base;
+        for(int i = exp; i < 0; i++){
+            negativeres /= base;
+        }
+        return negativeres;
+    }
+    for(int i = 0; i < exp; i++){
+        res *= base;
+    }
+    return res;
+}
+
+int i_pow(int base, int exp){
     int res = 1;
     for(int i = 0; i < exp; i++){
         res *= base;
@@ -269,15 +291,16 @@ int pow(int base, int exp){
     return res;
 }
 //int sqrt, float not implemented
-int sqrt(int num){
-    int res = 0;
-    int i = 0;
-    while(res <= num){
-        res = pow(2, i);
-        i++;
-    }
-    return res - 1;
-}
+// int sqrt(int num){
+//     int res = 0;
+//     int i = 0;
+//     while(res <= num){
+//         res = pow(2, i);
+//         i++;
+//     }
+//     return res - 1;
+// } //this is honestly awful, doesnt even work. what it does do is return the square ((x ^ 2))?? why does this even exist???
+//why did i write that??
 int abs(int num){
     if(num < 0){
         return num * -1;
@@ -308,7 +331,12 @@ int strlen(char *ptr){
 void strcpy(char* src, char* dest){
     //this would probably cause a segfault on a linux/windows machine
     while(*src){
-        *dest++ = *src++;
+        *(dest++) = *(src++);
+    }
+}
+void n_strcpy(char *src, char *dest){
+    for(int i = 0; i < strlen(src)+1; i++){
+        *(dest + i) = *(src + i);
     }
 }
 /*********************

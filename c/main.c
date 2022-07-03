@@ -1,5 +1,5 @@
 #include<stdint.h>
-#include "../headers/shell.h"
+#include "../headers/filesystem.h"
 extern const char a20_on;
 extern int main( void ){
     
@@ -19,7 +19,10 @@ extern int main( void ){
     print("Starting Keyboard Driver:\t", 0);
     irq_install_handler(1, *keyboard_handler);
     stdin = malloc(512); //beginning amount to allocate to stdin
-    print("DONE\nInitializing CLIOSFS\n", 0);
+    print("DONE\n", 0);
+    print("Starting Disk...\n", 0);
+    start_disk();
     showOutp = 1;
     shell_init();
+    kLBAwrite(0, "Hello, World!", 0, 1);
 }

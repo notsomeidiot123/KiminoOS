@@ -23,7 +23,7 @@ typedef struct file{
     int size;
     int *address;
     int *caddress;
-} FILE;
+} filedonotuse;
 int disk_mode = 0;
 void drive_test();
 int lastDiskAddress = 0;
@@ -46,13 +46,13 @@ int lastDiskAddress = 0;
 
 //     }
 // }
-char *fwrite(char *data, FILE file){
+char *donotusefwrite(char *data, filedonotuse file){
 
 }
-FILE *fopen(char *name){
+filedonotuse *donotusefopen(char *name){
 
 }
-void fclose(FILE *file){
+void donotusefclose(filedonotuse *file){
 
 }
 void pollDrive_BSY(char drive){
@@ -159,8 +159,11 @@ void drive_test(registers *regs){
 void Drive_Error_Handler();
 char kLBAwrite(int address, char *data, char driveNum, int sec_count){
     uint16_t *toWrite = malloc(512 * sec_count);
+    loopback:
     kLBAread(address, sec_count, driveNum, toWrite);
-    printdc(*toWrite);
+    if(*toWrite == 0){
+        goto loopback;
+    }
     pollDrive_BSY(driveNum);
     Drive_Error_Handler();
     outb(DRIVE_SELECT, 0xE0 | driveNum <<4 | (address >>24) & 0xF);//output drive data in LBA format, one byte at a time
@@ -170,12 +173,12 @@ char kLBAwrite(int address, char *data, char driveNum, int sec_count){
     outb(CYLINDER_LOW, (unsigned char) (address >>8));
     outb(CYLINDER_HIGH, (unsigned char) (address >>16));
     outb(COMMAND_REGISTER, 0x30);
-    strcpy(data, toWrite);
-    for(int i = 0; i < sec_count + 1; i++){
+    n_strcpy(data, toWrite);
+    for(int i = 0; i < sec_count; i++){
         pollDrive_BSY(driveNum);
         pollDrive_DRQ(driveNum);
         for(int j = 0; j < 256; j++){
-            outw(DATA_REGISTER, *toWrite++| *toWrite++ << 8);
+            outw(DATA_REGISTER, *(toWrite++));
         }
     }
     int status = inb(STATUS_REGISTER);

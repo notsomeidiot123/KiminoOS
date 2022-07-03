@@ -17,17 +17,6 @@ int shell_run(char *args){
     else if(parse(args, "testscreen")){
         testPrint();
     }
-    else if(parse(args, "d0")){
-        disk_mode = 0;
-    }
-    else if(parse(args, "d1")){
-        disk_mode = 1;
-        start_disk();
-    }
-    else if(parse(args, "testDisk")){
-        print("Testing...\n", 0);
-        kLBAwrite(0, "TEST", 0, 1);
-    }
     print("$>", 0);
 }
 extern void reset();
