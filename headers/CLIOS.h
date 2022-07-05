@@ -1,6 +1,6 @@
 #include <stdint.h>
 //basics
-#define null (char *)0x00
+#define null 0
 #define _CLIOS_ 0x1000
 #define _BITS 32
 #define _VGAFB 0xb8000
@@ -131,7 +131,9 @@ int print(const char *str, char caps){
         else if(caps){
             if(*str == '\''){
                 vga_framebuffer[index++] = '\"' | WHITE << 8;
+                
             }
+            str++;
             continue;
         }
         else{
@@ -194,12 +196,29 @@ int printdc(int num){
         tmp = free(2);
     }while(*buffer);
 }
+/*
+int printdc(int num){
+    int tmpn = num;
+    char *buffer = malloc(512);
+    char *base = buffer;
+    *buffer = 0;
+    do{
+        *(buffer++) = tmpn % 10 + 48;
+        tmpn /= 10;
+    }while(tmpn > 0);
+    do{
+        char *tmp = malloc(2);
+        *tmp = *(buffer--);
+        *(tmp+1) = 0;
+        print(tmp, 0);
+        num /= 10;
+        tmp = free(2);
+    }while(*buffer);
+}
+*/
 int freemem = 0x100000;
 char* malloc(int size){
     unsigned int* dest = (unsigned int*)size;
-    for(int i = 0; i < size; i++){
-        dest[i] = 0;
-    }
     char* address = (char*)freemem;
     freemem += size;
     return address;
@@ -345,3 +364,105 @@ void n_strcpy(char *src, char *dest){
 *********************/
 
 //IMPLEMENT STACK SMASHING PROTECTOR!!!!
+char nums[] = {
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' 
+};
+void toHex(int num, char* str){
+    char * str1 = malloc(16);
+    *(str1++) = 0;
+    char *cpy;
+    cpy = str;
+    while(*cpy){
+        *str1++ = nums[num % 16];
+        num /=16;
+    }
+    while(*str1){
+        *str++ = *str1--;
+    }
+}
+char strcmp(char *str, char *cmd){
+    //match str to command
+    //if match, return 1
+    //else return 0
+    int i = 0;
+    while(str[i]){
+        if(str[i] == cmd[i]){
+            if(cmd[i+1] == 0 && str[i+1] == 0){
+                return 1;
+            }
+        }else{
+            return 0;
+        }
+        i++;
+    }
+}
+char *strtok(char *s, const char d)
+{
+    // Stores the state of string
+    static char* input = null;
+ 
+    // Initialize the input string
+    if (s != null)
+        input = s;
+ 
+    // Case for final token
+    if (input == null)
+        return null;
+ 
+    // Stores the extracted string
+    char* result = malloc(strlen(input) + 1);
+    int i = 0;
+ 
+    // Start extracting string and
+    // store it in array
+    for (; input[i] != '\0'; i++) {
+ 
+        // If delimiter is not reached
+        // then add the current character
+        // to result[i]
+        if (input[i] != d)
+            result[i] = input[i];
+ 
+        // Else store the string formed
+        else {
+            result[i] = '\0';
+            input = input + i + 1;
+            return result;
+        }
+    }
+ 
+    // Case when loop ends
+    result[i] = '\0';
+    input = null;
+ 
+    // Return the resultant pointer
+    // to the string
+    return result;
+}
+char **splitss(char *str){
+    //make sure strarr is appropriately sized, strarr splits string based on spaces
+    char **strarr = malloc(128 * 8);
+    char **base = strarr;
+    int arrindex = 0;
+    int index = 0;
+    char *token = strtok(*str, ' ');
+    while(token){
+        strcpy(token, strarr[arrindex++]);
+        print(token, 0);
+        token = strtok(null, ' ');
+    }
+    return base;
+}
+
+void splits(char *str, char **strarr, char* delims){
+    return;
+}
+
+void kprint(char *data){
+    print(data, 0);
+}
+
+// void shutdown(){
+//     kprint("shutting down...\n");
+
+// }

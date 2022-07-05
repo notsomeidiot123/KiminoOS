@@ -96,6 +96,7 @@ void keyboard_handler(registers *r){
                 }
                 print(scancodes[scancode], shiftpressed);
                 break;
+                
              }
         }
     }

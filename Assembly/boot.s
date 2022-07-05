@@ -33,7 +33,7 @@ Boot:
     mov es, bx
     mov bx, KERNEL
     int 13h
-    call detect_mem
+    ; call detect_mem
     ProtectedStart:
     cli
     lgdt[GDTDESC]
@@ -68,7 +68,7 @@ GDTDESC:
     dd GDTSTART
 CODE equ codedesc - GDTSTART
 DATA equ datadesc - GDTSTART
-%include "Assembly/bootutils.s"
+; %include "Assembly/bootutils.s"
 [bits 32]
 Protectedmode:
     mov eax, 0
@@ -90,11 +90,13 @@ check_a20:
     cmpsd
     popad
     je a20_off
-    mov byte bx, 1
+    ; call detect_mem
+    mov byte cx, 1
     jmp KERNEL
     jmp $
 a20_off:
-    mov byte bx, 0
+    ; call detect_mem
+    mov byte cx, 0
     jmp KERNEL
     jmp $
 jmp $

@@ -190,7 +190,22 @@ extern void _fhandler(registers *r)
     if (r->int_no < 32)
     {
         print(exception_messages[r->int_no], 0);
-        print(" Exception. System Halted!\n\r",  0);
+        print(" Exception. System Halted!\n",  0);
+        if(r->int_no == 2){
+            int system_port_a = 0x92;
+            int system_port_b = 0x61;
+            char sysctrla = inb(system_port_a);
+            char sysctrlb = inb(system_port_b);
+            if(sysctrla & 16){
+                kprint("Watchdog Timer\n");
+            }
+            if(sysctrlb & 0x40){
+                kprint("Channel Check, Bus error\n");
+            }
+            if(sysctrlb & 0x80){
+                kprint("Parity Check\n");
+            }
+        }
         for(;;);
     }
 }
