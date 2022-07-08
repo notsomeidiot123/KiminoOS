@@ -31,6 +31,10 @@ extern int main( void ){
     print("Starting Disk...\t", 0);
     start_disk();
     kprint("DONE\n");
-    showOutp = 1;
-    shell_init();
+    // showOutp = 1;
+    // shell_init();
+    file *f_test;
+    f_test->filename = "ENDKERNEL";
+    fs_search(f_test->filename, f_test);
+    kprint(f_test->startAddress);
 }

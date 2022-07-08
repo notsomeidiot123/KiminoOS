@@ -5,9 +5,9 @@ gcc c/main.c -c -g -ffreestanding -fno-pie -o o/main.o -m32 -w -Wimplicit-functi
 ld --oformat binary o/kentry.o o/main.o o/idt.o -o bin/kernel -Ttext 0x1000 -melf_i386
 gcc applications/test.c -ffreestanding -fno-pie -w -o o/test.o -c -g -m32
 ld --oformat binary o/test.o -o bin/test -melf_i386
-cat bin/CLIOSBOOT bin/kernel headers/txt bin/test> CLIOS.iso
+cat bin/CLIOSBOOT bin/kernel headers/txt > CLIOS.iso
 
-qemu-img resize CLIOS.iso 2g
+# qemu-img resize CLIOS.iso 2g
 
 qemu-system-x86_64 CLIOS.iso -d int -M smm=off -no-reboot -no-shutdown
 rm hd.txt
