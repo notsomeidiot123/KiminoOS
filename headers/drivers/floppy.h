@@ -1,4 +1,5 @@
 #include"keyboard.h"
+#pragma once
 enum FloppyRegisters
 {
    STATUS_REGISTER_A                = 0x3F0, // read-only

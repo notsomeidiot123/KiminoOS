@@ -1,4 +1,6 @@
 #include "diskdriver.h"
+#include "../CLIOS.h"
+#pragma once
 #define EOF 0x3
 typedef struct {
     char *filename;

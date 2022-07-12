@@ -1,4 +1,7 @@
-#include "filesystem.h"
+#include "../drivers/filesystem.h"
+#include "../CLIOS.h"
+#include "../drivers/keyboard.h"
+#pragma once
 char started = 0;
 int shell(char* args){
     

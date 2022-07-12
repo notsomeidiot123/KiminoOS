@@ -1,4 +1,6 @@
-#include "floppy.h"
+#include "../CLIOS.h"
+#include "../idt.h"
+#pragma once
 enum disk_registers{
     PRIMARY_BASE = 0x1F0,
     PRIMARY_CTRL = 0x3F6,

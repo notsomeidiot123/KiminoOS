@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include "CLIOS.h"
-
+#pragma once
 #define FLAGSET(number, flag) number |= flag
 #define FLAGUNSET(number, flag) number &= -flag
 typedef struct

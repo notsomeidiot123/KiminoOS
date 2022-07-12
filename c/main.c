@@ -1,5 +1,9 @@
 #include<stdint.h>
-#include "../headers/shell.h"
+#include "../headers/drivers/filesystem.h"
+#include "../headers/drivers/keyboard.h"
+#include "../headers/shell/shell.h"
+#include "../headers/CLIOS.h"
+#include "../headers/idt.h"
 extern const char a20_on;
 const int *memory = 0x7e00;
 
@@ -29,12 +33,8 @@ extern int main( void ){
     stdin = malloc(512); //beginning amount to allocate to stdin
     print("DONE\n", 0);
     print("Starting Disk...\t", 0);
-    start_disk();
-    kprint("DONE\n");
-    // showOutp = 1;
-    // shell_init();
-    file *f_test;
-    f_test->filename = "ENDKERNEL";
-    fs_search(f_test->filename, f_test);
-    kprint(f_test->startAddress);
+    showOutp = 1;
+
+    shell_init();
+    kprint("Hello, World");
 }

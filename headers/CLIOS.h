@@ -1,4 +1,5 @@
 #include <stdint.h>
+#pragma once
 //basics
 #define null 0
 #define _CLIOS_ 0x1000

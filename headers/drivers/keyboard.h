@@ -1,4 +1,5 @@
-#include "idt.h"
+#include "../idt.h"
+#pragma once
 unsigned char *scancodes[128] = {
     0, "\e","1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
     "-", "=", "\b", "\t", "q", "w", "e", "r", "t", "y",
