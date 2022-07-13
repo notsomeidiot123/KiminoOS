@@ -40,9 +40,12 @@ void keyboard_handler(registers *r){
                 break;
             case 0x9d:
                 ctrlpressed = 0;
+                break;
         }
     }else{
         switch(scancode){
+            case 0x38:
+                break;
             case 0x1d:
                 ctrlpressed = 1;
                 break;
@@ -57,12 +60,15 @@ void keyboard_handler(registers *r){
                 break;
             case 0x1c:
                 stdin[stdindex] = '\0';
-                print("\n", 0);
-                shell_run(stdin);
-                while(stdindex){
-                    stdin[stdindex] = '\0';
-                    stdindex--;
+                if(showOutp = 1) {
+                    print("\n", 0);
+                    shell_run(stdin);
+                    while(stdindex){
+                        stdin[stdindex] = '\0';
+                        stdindex--;
+                    }
                 }
+                
                 
                 break;
             case 0xe:
@@ -82,23 +88,86 @@ void keyboard_handler(registers *r){
                 break;
             default:
              if(showOutp){
+                char tstdin = stdincodes[scancode];
                 if(shiftpressed){
-                    char tstdin = stdincodes[scancode];
-                    if(tstdin = '\''){
-                        tstdin = '\"';
-                        stdin[stdindex++] = tstdin;
-                    }
-                    else{
-                        stdin[stdindex++] = tstdin - 32;
-                    }
+                    
+                    switch(tstdin){
+                        case '\'':
+                            stdin[stdindex] = '\"';
+                            break;
+                        case ';':
+                            stdin[stdindex] = ':';
+                            break;
+                        case '[':
+                            stdin[stdindex] = '{';
+                            break;
+                        case ']':
+                            stdin[stdindex] = '}';
+                            break;
+                        case ',':
+                            stdin[stdindex] = '<';
+                            break;
+                        case '.':
+                            stdin[stdindex] = '>';
+                            break;
+                        case '/':
+                            stdin[stdindex] = '?';
+                            break;
+                        case '\\':
+                            stdin[stdindex] = '|';
+                            break;
+                        case '-':
+                            stdin[stdindex] = '_';
+                            break;
+                        case '=':
+                            stdin[stdindex] = '+';
+                            break;
+                        case '`':
+                            stdin[stdindex] = '~';
+                            break;
+                        case '1':
+                            stdin[stdindex] = '!';
+                            break;
+                        case '2':
+                            stdin[stdindex] = '@';
+                            break;
+                        case '3':
+                            stdin[stdindex] = '#';
+                            break;
+                        case '4':
+                            stdin[stdindex] = '$';
+                            break;
+                        case '5':
+                            stdin[stdindex] = '%';
+                            break;
+                        case '6':
+                            stdin[stdindex] = '^';
+                            break;
+                        case '7':
+                            stdin[stdindex] = '&';
+                            break;
+                        case '8':
+                            stdin[stdindex] = '*';
+                            break;
+                        case '9':
+                            stdin[stdindex] = '(';
+                            break;
+                        case '0':
+                            stdin[stdindex] = ')';
+                            break;
+                        default:
+                            stdin[stdindex] = stdincodes[scancode] - 32;
+                            break;
+                    }       
                 }
                 else{
-                    stdin[stdindex++] = stdincodes[scancode];
+                    stdin[stdindex] = stdincodes[scancode];
                 }
                 print(scancodes[scancode], shiftpressed);
+                stdindex++;
                 break;
                 
-             }
+            }
         }
     }
 }

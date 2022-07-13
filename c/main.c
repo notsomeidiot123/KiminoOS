@@ -7,10 +7,6 @@
 extern const char a20_on;
 const int *memory = 0x7e00;
 
-void test(registers *regs){
-    kprint("test");
-    printdc(regs->int_no);
-}
 
 extern int main( void ){
     clear();
@@ -29,12 +25,11 @@ extern int main( void ){
     }
     print("Starting Keyboard Driver:\t", 0);
     irq_install_handler(1, *keyboard_handler);
-    irq_install_handler(0, *test);
     stdin = malloc(512); //beginning amount to allocate to stdin
     print("DONE\n", 0);
     print("Starting Disk...\t", 0);
     showOutp = 1;
-
+    char *e = malloc(512);
+    kLBAread(0, 1, 0, e);
     shell_init();
-    kprint("Hello, World");
 }

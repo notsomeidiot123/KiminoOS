@@ -1,4 +1,5 @@
 #include "diskdriver.h"
+#include "../shell/shell.h"
 #include "../CLIOS.h"
 #pragma once
 #define EOF 0x3
@@ -58,20 +59,3 @@ void fs_search(char *filename, file *fp){
     } //find max address, then if addr >= max, overflow to 0
 }
 
-int strmatch(char *str, char *delim){
-    int len = strlen(delim);
-    int index = 0;
-    int offset = 0;
-    while(*str){
-        if(*str++ == delim[index]){
-            index++;
-            if(index == len){
-                return offset - index;
-            }
-        }
-        else{
-            index = 0;
-        }
-        offset++;
-    }
-}

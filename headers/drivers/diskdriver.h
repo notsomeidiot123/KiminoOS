@@ -66,6 +66,14 @@ void pollDrive_DRQ(char drive){
 char kLBAread(int address, int size, char driveNum, uint16_t *buffer);
 char kLBAwrite(int address, char *data, char driveNum, int sec_count);
 
+typedef struct{
+    char driveInfo; //bits 0-3 denote drive num, 4 is 1 if uses ATAPI, 5 is one if drive uses AHCI, 6 is denotes LBA48 support, and bit 7 is valid bit
+    char *drive_name;
+    int lba_base_address;
+    int lba_max_address;
+    int lba_sector_size;
+} DRIVE;
+
 //0 for hard drive, 1 for SSD
 char drive_type = 0;
 //0 for CHS, 1 for LBA, 2 for LBA48

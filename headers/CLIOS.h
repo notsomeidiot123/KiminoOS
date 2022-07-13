@@ -130,10 +130,75 @@ int print(const char *str, char caps){
             continue;
         }
         else if(caps){
-            if(*str == '\''){
-                vga_framebuffer[index++] = '\"' | WHITE << 8;
-                
+            switch(*str){
+                case '\'':
+                    vga_framebuffer[index++] = '\"' | WHITE << 8;
+                    break;
+                case ';':
+                    vga_framebuffer[index++] = ':' | WHITE << 8;
+                    break;
+                case '[':
+                    vga_framebuffer[index++] = '{' | WHITE << 8;
+                    break;
+                case ']':
+                    vga_framebuffer[index++] = '}' | WHITE << 8;
+                    break;
+                case ',':
+                    vga_framebuffer[index++] = '<' | WHITE << 8;
+                    break;
+                case '.':
+                    vga_framebuffer[index++] = '>' | WHITE << 8;
+                    break;
+                case '/':
+                    vga_framebuffer[index++] = '?' | WHITE << 8;
+                    break;
+                case '\\':
+                    vga_framebuffer[index++] = '|' | WHITE << 8;
+                    break;
+                case '-':
+                    vga_framebuffer[index++] = '_' | WHITE << 8;
+                    break;
+                case '=':
+                    vga_framebuffer[index++] = '+' | WHITE << 8;
+                    break;
+                case '`':
+                    vga_framebuffer[index++] = '~' | WHITE << 8;
+                    break;
+                case '1':
+                    vga_framebuffer[index++] = '!' | WHITE << 8;
+                    break;
+                case '2':
+                    vga_framebuffer[index++] = '@' | WHITE << 8;
+                    break;
+                case '3':
+                    vga_framebuffer[index++] = '#' | WHITE << 8;
+                    break;
+                case '4':
+                    vga_framebuffer[index++] = '$' | WHITE << 8;
+                    break;
+                case '5':
+                    vga_framebuffer[index++] = '%' | WHITE << 8;
+                    break;
+                case '6':
+                    vga_framebuffer[index++] = '^' | WHITE << 8;
+                    break;
+                case '7':
+                    vga_framebuffer[index++] = '&' | WHITE << 8;
+                    break;
+                case '8':
+                    vga_framebuffer[index++] = '*' | WHITE << 8;
+                    break;
+                case '9':
+                    vga_framebuffer[index++] = '(' | WHITE << 8;
+                    break;
+                case '0':
+                    vga_framebuffer[index++] = ')' | WHITE << 8;
+                    break;
             }
+            // if(*str == '\''){
+            //     vga_framebuffer[index++] = '\"' | WHITE << 8;
+                
+            // }
             str++;
             continue;
         }
@@ -463,7 +528,20 @@ void kprint(char *data){
     print(data, 0);
 }
 
-// void shutdown(){
-//     kprint("shutting down...\n");
-
-// }
+int strmatch(char *str, char *delim){
+    int len = strlen(delim);
+    int index = 0;
+    int offset = 0;
+    while(*str){
+        if(*str++ == delim[index]){
+            index++;
+            if(index == len){
+                return offset - index;
+            }
+        }
+        else{
+            index = 0;
+        }
+        offset++;
+    }
+}
