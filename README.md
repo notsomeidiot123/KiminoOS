@@ -3,7 +3,7 @@
 
 ## [FEATURES]
 
-developed by Notsomeidiot123/Kiminosei <-- same person
+developed by Kimi (@notsomeidiot123)
 
 Only has 1 language setting <- :) ✅
 
