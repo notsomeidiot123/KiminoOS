@@ -1,7 +1,9 @@
 #include "../drivers/filesystem.h"
+#include "../string.h"
 #include "../CLIOS.h"
-#include "../drivers/keyboard.h"
+
 #pragma once
+char showOutp = 0;
 char started = 0;
 int shell(char* args){
     
@@ -32,7 +34,6 @@ int shell_run(char *args){
 }
 extern void reset();
 int shell_init(void){
-    stdin = malloc(512); //beginning amount to allocate to stdin
     print("KiminoOS v0.1.0-alpha\n", 0);
     print("Type 'syshelp' for a list of commands\n", 0);
     print("Type 'exit' to exit the shell\n", 0);

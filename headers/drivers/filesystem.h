@@ -1,5 +1,5 @@
 #include "diskdriver.h"
-#include "../shell/shell.h"
+// #include "../drivers/keyboard.h"
 #include "../CLIOS.h"
 #pragma once
 #define EOF 0x3

@@ -1,9 +1,11 @@
 #include "../idt.h"
+#include "../shell/shell.h"
+#include "../CLIOS.h"
 #pragma once
-unsigned char *scancodes[128] = {
+const char *scancodes[128] = {
     0, "\e","1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
     "-", "=", "\b", "\t", "q", "w", "e", "r", "t", "y",
-    "u", "i", "o", "p", "[", "]", 0x1c, 0x1d, "a", "s",
+    "u", "i", "o", "p", "[", "]", (char)0x1c, 0x1d, "a", "s",
     "d", "f", "g", "h", "j", "k", "l", ";", "'", "`", 0x2a,
     "\\", "z", "x", "c","v","b", "n", "m", ",", ".", "/",
      0x36, "*", 0x38, " ", 0x3a
@@ -23,9 +25,9 @@ unsigned char stdincodes[128] = {
 char shiftpressed = 0;
 int curposy = 3;
 int curposx = 0;
-char showOutp = 0;
+
 int stdindex = 0;
-char *stdin = 0;
+char *stdin = 0; //beginning amount to allocate to stdin;
 char run = 0;
 char ctrlpressed = 0;
 void keyboard_handler(registers *r){
