@@ -9,6 +9,9 @@ const int *memory = 0x7e00;
 
 
 extern int main( void ){
+    
+    boot_drive.drive_name = "BOOTDRIVE";
+    boot_drive.lba_base_address = 0;
     clear();
     enable_cursor(0, 15);
     uint16_t *bda = (uint16_t *)0x400;//0x400 is the base address of the BDA
@@ -28,8 +31,20 @@ extern int main( void ){
     stdin = malloc(512); //beginning amount to allocate to stdin
     print("DONE\n", 0);
     print("Starting Disk...\t", 0);
+    start_disk(&boot_drive);
+    kprint("DONE\n");
     showOutp = 1;
-    char *e = malloc(512);
-    kLBAread(0, 1, 0, e);
+    char *buffer = malloc(512);
+    kLBAread(boot_drive.lba_max_address-1,1, 0, buffer, &boot_drive);
+    int i = 0;
+    while(i != 511){
+        printdc(buffer[i++]);
+        kprint(" ");
+    }
+    kprint("\n");
+    if(strmatch(buffer, "ENDKERNEL")){
+        kprint("found");
+    }
+    kprint("\n");
     shell_init();
 }

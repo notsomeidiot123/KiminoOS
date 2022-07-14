@@ -50,6 +50,20 @@ int shell_run(char *args){
                 }
             }
         }
+        else if(strcmp(command, "drvinf")){
+            kprint(boot_drive.drive_name);
+            kprint("\n\tMaximum Address:\t");
+            printdc(boot_drive.lba_max_address);
+            kprint("\n\tSector Size:    \t");
+            int s = i_pow(2, boot_drive.lba_sector_size);
+            if(s == 0){
+                 s = 512;
+            }
+            printdc(s);
+            kprint("\n\tDrive Size:     \t");
+            printdc(((boot_drive.lba_max_address * s)/1024)/1024);
+            kprint("MB\n");
+        }
         print("$>", 0);
     }
 }

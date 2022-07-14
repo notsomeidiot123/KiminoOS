@@ -30,16 +30,11 @@ void pollDrive_BSY(char drive){
 void pollDrive_DRQ(char drive){
     while(!(inb(STATUS_REGISTER) & 0x40));
 }
-char kLBAread(int address, int size, char driveNum, uint16_t *buffer);
-char kLBAwrite(int address, char *data, char driveNum, int sec_count);
 
-typedef struct{
-    char driveInfo; //bits 0-3 denote drive num, 4 is 1 if uses ATAPI, 5 is one if drive uses AHCI, 6 is denotes LBA48 support, and bit 7 is valid bit
-    char *drive_name;
-    int lba_base_address;
-    int lba_max_address;
-    int lba_sector_size;
-} DRIVE;
+char kLBAread(int address, int size, char driveNum, uint16_t *buffer, DRIVE *drive);
+char kLBAwrite(int address, char *data, char driveNum, int sec_count, DRIVE *drive);
+
+
 
 //0 for hard drive, 1 for SSD
 char drive_type = 0;
@@ -50,7 +45,7 @@ void reset_Disk(){
     outb(COMMAND_REGISTER, 0x4);
 }
 int AHCI_Drive();
-int start_disk(void){
+int start_disk(DRIVE *drive){
     int status = inb(STATUS_REGISTER);
     if(status == 0xff){
     }
@@ -108,14 +103,22 @@ int start_disk(void){
         for(int i = 0; i < 256; i++){
             data_buffer[i] = inw(DATA_REGISTER);
         }
-        if(data_buffer[0]){
+        if(data_buffer[0] & 15){
             drive_type = 1;
         }
         if(data_buffer[83] & 0x200){
             Address_Mode = 2;
         }
         if(data_buffer[60] && data_buffer[61]){
-            Address_Mode = 1; //supports LBA addressing mode
+            drive->lba_max_address = data_buffer[60] | data_buffer[61] << 16;
+        }
+        if(data_buffer[106] & 12){
+            drive->lba_sector_size = data_buffer[118];
+        }
+        else if(data_buffer[106]){
+            char p = data_buffer[106] & 1 | data_buffer[106] & 2 | data_buffer[106] & 4;
+            drive->lba_sector_size = 512 * i_pow(2, p);
+            printdc(drive->lba_sector_size);
         }
         if(inb(ERROR_REGISTER)){
             return DRIVE_ERROR;
@@ -134,9 +137,9 @@ void drive_test(registers *regs){
 //BECAUSE IM DUMB AND CHOSE ATA OVER AHCI
 //AHCI IS SO MUCH BETTERRRR
 void Drive_Error_Handler();
-char kLBAwrite(int address, char *data, char driveNum, int sec_count){
+char kLBAwrite(int address, char *data, char driveNum, int sec_count, DRIVE *drive){
     uint16_t *toWrite = malloc(512 * sec_count);
-    kLBAread(address, sec_count, driveNum, toWrite);
+    kLBAread(address, sec_count, driveNum, toWrite, drive);
     pollDrive_BSY(driveNum);
     Drive_Error_Handler();
     outb(DRIVE_SELECT, 0xE0 | driveNum <<4 | (address >>24) & 0xF);//output drive data in LBA format, one byte at a time
@@ -150,7 +153,7 @@ char kLBAwrite(int address, char *data, char driveNum, int sec_count){
     for(int i = 0; i < sec_count; i++){
         pollDrive_BSY(driveNum);
         pollDrive_DRQ(driveNum);
-        for(int j = 0; j < 256; j++){
+        for(int j = 0; j < drive->lba_sector_size/2; j++){
             outw(DATA_REGISTER, *(toWrite++));
         }
     }
@@ -164,7 +167,7 @@ char kLBAwrite(int address, char *data, char driveNum, int sec_count){
     outb(COMMAND_REGISTER, 0xE7); // clear buffer
     Drive_Error_Handler();
 }
-char kLBAread(int address, int size, char driveNum, uint16_t *bufferADdr){
+char kLBAread(int address, int size, char driveNum, uint16_t *bufferAddr, DRIVE *drive){
     //check status
     pollDrive_BSY(driveNum);
     //read data
@@ -174,20 +177,23 @@ char kLBAread(int address, int size, char driveNum, uint16_t *bufferADdr){
     outb(CYLINDER_LOW, (unsigned char) (address >>8));
     outb(CYLINDER_HIGH, (unsigned char) (address >>16));
     outb(COMMAND_REGISTER, 0x20);
-    uint16_t *buffer = bufferADdr;
+    uint16_t *buffer = bufferAddr;
     for(int i = 0; i < size; i++){
-        for(int j = 0; j < 256; j++){
+        for(int j = 0; j < drive->lba_sector_size/2; j++){
             buffer[j] = inw(DATA_REGISTER);
         }
-        buffer += 256;
+        buffer += drive->lba_sector_size/2;
     }
     outb(COMMAND_REGISTER, 0xE7);
     Drive_Error_Handler();
     int status = inb(STATUS_REGISTER);
     if(status & 1){
+        kprint("error");
         return DRIVE_ERROR;
     }
-    else if(status & 32){
+    else if(status & 32)
+    {
+        kprint("error");
         return DRIVE_ERROR;
     }
 }
@@ -198,7 +204,7 @@ uint16_t *readDisk(int address, int secnum, char drivenum){
     uint16_t *buffer = malloc(sizeof(uint16_t) * 256* secnum);
     switch(disk_mode){
         case 0:
-            kLBAread(address, secnum, drivenum, buffer);
+            // kLBAread(address, secnum, drivenum, buffer);
             break;
         case 1:
             //AHCI_read

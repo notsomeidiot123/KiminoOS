@@ -11,10 +11,10 @@ int strmatch(char *str, char *delim){
     int len = strlen(delim);
     int index = 0;
     int offset = 0;
-    while(*str){
-        if(*str++ == delim[index]){
+    while(offset < strlen(str)){
+        if(str[offset] == delim[index]){
             index++;
-            if(index == len){
+            if(index == (len)){
                 return offset - index;
             }
         }

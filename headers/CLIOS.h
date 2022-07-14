@@ -28,6 +28,26 @@
 #define true 1
 #define false 0
 
+typedef struct{
+    char driveInfo; //bits 0-3 denote drive num, 4 is 1 if uses ATAPI, 5 is one if drive uses AHCI, 6 is denotes LBA48 support, and bit 7 is valid bit
+    char *drive_name;
+    int lba_base_address;
+    int lba_max_address;
+    int lba_sector_size;
+} DRIVE;
+
+typedef struct {
+    char *filename;
+    int ptr;
+    uint32_t startAddress;
+    uint8_t start_offset;
+    uint32_t endAddress;
+    uint8_t end_offset;
+    DRIVE *d_info;
+} file;
+
+
+
 uint16_t *vga_framebuffer = (uint16_t*)_VGAFB;
 int index = 80;
 int xpos = 0;
@@ -55,6 +75,7 @@ enum RET_ERRORS{
     RESERVED_MID = 14,
     RESERVED_HI = 15,
 };
+DRIVE boot_drive;
 enum APP_ERRORS{
     //123456789ABCDEF
     NOT_RESPONDING = 0xE1F124, //elfish
@@ -372,6 +393,7 @@ float f_pow(int base, int exp){
 
 int i_pow(int base, int exp){
     int res = 1;
+    if(exp == 0) return 1;
     for(int i = 0; i < exp; i++){
         res *= base;
     }

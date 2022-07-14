@@ -7,7 +7,7 @@ gcc applications/test.c -ffreestanding -fno-pie -w -o o/test.o -c -g -m32
 ld --oformat binary o/test.o -o bin/test -melf_i386
 cat bin/CLIOSBOOT bin/kernel headers/txt > CLIOS.iso
 
-# qemu-img resize CLIOS.iso 2g
+# qemu-img resize CLIOS.iso 1G
 
 qemu-system-x86_64 CLIOS.iso -d int -M smm=off -no-reboot -no-shutdown
 rm hd.txt

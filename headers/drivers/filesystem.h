@@ -3,14 +3,7 @@
 #include "../CLIOS.h"
 #pragma once
 #define EOF 0x3
-typedef struct {
-    char *filename;
-    int ptr;
-    uint32_t startAddress;
-    uint8_t start_offset;
-    uint32_t endAddress;
-    uint8_t end_offset;
-} file;
+
 
 void exec_file(file *file);
 
@@ -32,17 +25,18 @@ int install_fs(){
     int 13h*/
 //LBA = (0 x 16 + 0) x 63 + (0x35 - 1)
 
-void fs_search(char *filename, file *fp){
+void fs_search(char *filename, file *fp, DRIVE *driveStruct){
     uint8_t matched = 0;
     char *drive = malloc(512);
     int addr = 0x234;
     uint8_t eof_found = 0;
     int addr_offset = 0;
     while(!matched){
-        kLBAread(addr+= 1 , 1, 0, drive);
+        kLBAread(addr+= 1 , 1, 0, drive, driveStruct);
         matched = strmatch(drive, filename);
-        printdc(addr);
-        kprint(" Searching...\n");
+        if(addr >= driveStruct->lba_max_address){
+            addr = 0;
+        }
         if(matched > 0){
             fp->startAddress = addr;
             fp->start_offset = matched;
