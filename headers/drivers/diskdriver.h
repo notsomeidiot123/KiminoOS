@@ -20,43 +20,10 @@ enum disk_registers{
     DEVICE_CONTROL = 0x3f6,
     DRIVE_ADDRESS = 0x3f7
 };
-typedef struct file{
-    char *name;
-    int size;
-    int *address;
-    int *caddress;
-} filedonotuse;
 int disk_mode = 0;
 void drive_test();
 int lastDiskAddress = 0;
-// char *fread(int size, FILE *file){
-//     if(size > file.size){
-//         size = file.size;
-//     }else if(size <= 0){
-//         return FILE_ERROR;
-//     }
-//     else if(size > 8192){
-//         //prevent file data from flooding RAM
-//         //ik 8kb is small, but i dont want to risk anything
-//         return BUFFER_TOO_LARGE;
-//     }
-//     char fchar = 0;
-//     //pre-check for control characters
-//     char *buffer = malloc(size);
 
-//     if(fchar == 0){
-
-//     }
-// }
-char *donotusefwrite(char *data, filedonotuse file){
-
-}
-filedonotuse *donotusefopen(char *name){
-
-}
-void donotusefclose(filedonotuse *file){
-
-}
 void pollDrive_BSY(char drive){
     while(inb(STATUS_REGISTER) & 0x80);
 }

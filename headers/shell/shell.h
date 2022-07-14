@@ -18,8 +18,8 @@ int shell_run(char *args){
         if(strcmp(command, "syshelp")){
             print("Commands:\n\tsyshelp: Show this information\n", 0);
             print("\tclear: clear the screen\n", 0);
-            kprint("\texit: shutdown the system\n");
-            kprint("\twrt: write text to stdout\n");
+            // kprint("\texit: shutdown the system\n");
+            kprint("\twrt: write text to stdout | THIS IS FOR DEBUG PURPOSES\n");
         }else if(strcmp(command, "clear")){
             clear();
         }
@@ -28,6 +28,27 @@ int shell_run(char *args){
         }
         else if(strcmp(command, "exit")){
             // shutdown();
+        }
+        else if(strcmp(command, "wrt")){
+            int arrlen = 0;
+            char *s = strtok(args, ' ');
+            while(s){
+                arrlen++;
+                s = strtok(null, ' ');
+                
+            }
+            char *text = strtok(args, ' ');
+            int count = 1;
+            while(text){
+                text = strtok(null, ' ');
+                if(text == null){
+                    break;
+                }
+                print(text, 0);
+                if(++count < arrlen){
+                    kprint(" ");
+                }
+            }
         }
         print("$>", 0);
     }
