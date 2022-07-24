@@ -1,7 +1,8 @@
 #include "../drivers/filesystem.h"
 #include "../string.h"
 #include "../CLIOS.h"
-
+#include "../idt.h"
+#include "../drivers/time.h"
 #pragma once
 char showOutp = 0;
 char started = 0;
@@ -34,8 +35,7 @@ int shell_run(char *args){
             char *s = strtok(args, ' ');
             while(s){
                 arrlen++;
-                s = strtok(null, ' ');
-                
+                s = strtok(null, ' ');                
             }
             char *text = strtok(args, ' ');
             int count = 1;
@@ -61,8 +61,25 @@ int shell_run(char *args){
             }
             printdc(s);
             kprint("\n\tDrive Size:     \t");
-            printdc(((boot_drive.lba_max_address * s)/1024)/1024);
-            kprint("MB\n");
+            long int mb = (boot_drive.lba_max_address * s);
+            if(mb/1024/1024 >= 1024|| mb/1024/1024 <= 0){
+                printdc(mb/1024/1024/1024);
+                print("GB\n", 0);
+            }
+            else if( mb/1024 >= 1024 | mb/1024 <=0){
+                printdc(mb/1024/1024);
+                kprint("MB\n");
+            }
+            else{
+                printdc(mb/1024);
+                kprint("KB");
+
+            }
+        }
+        else if(strcmp(command, "uptime")){
+            kprint("Computer has been running for ");
+            printdc(seconds);
+            kprint(" seconds\n");
         }
         print("$>", 0);
     }

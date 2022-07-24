@@ -28,6 +28,9 @@
 #define true 1
 #define false 0
 
+extern const int memsizelow;
+extern const int memsizehigh;
+
 typedef struct{
     char driveInfo; //bits 0-3 denote drive num, 4 is 1 if uses ATAPI, 5 is one if drive uses AHCI, 6 is denotes LBA48 support, and bit 7 is valid bit
     char *drive_name;
@@ -101,6 +104,7 @@ void outw(uint16_t port, uint16_t data){
     asm volatile("outw %0, %1" : : "a"(data), "Nd"(port));
     return;
 }
+char *free(int size);
 void update_cursor(int x, int y)
 {
 	uint16_t pos = y * _RESX + x;
@@ -109,6 +113,15 @@ void update_cursor(int x, int y)
 	outb(0x3D5, (uint8_t) (pos & 0xFF));
 	outb(0x3D4, 0x0E);
 	outb(0x3D5, (uint8_t) ((pos >> 8) & 0xFF));
+}
+char *malloc(int size);
+void kprint(char *str);
+void putc(char c){
+    char *e = malloc(2);
+    e[0] = c;
+    e[1] = 0;
+    kprint(e);
+    free(2);
 }
 int print(const char *str, char caps){
     
@@ -247,13 +260,12 @@ int print(const char *str, char caps){
     return 0;
 }
 void delkey(){
-    index--;
-    vga_framebuffer[index] = 0x00 | 0xf << 8;
+    vga_framebuffer[--index] = 0x00 | 0xf << 8;
     xpos--;
     //fix cursor glitch eventually
     if(xpos < 0){
         xpos = 79;
-        ypos --;
+        ypos--;
     }
     update_cursor(xpos, ypos);
     return;
@@ -266,14 +278,18 @@ int clear(void){
     }
 }
 char *malloc(int size);
-char *free(int size);
+
+int abs(int num);
 int printdc(int num){
     int tmpn = num;
     char *buffer = malloc(512);
     char *base = buffer;
     *buffer = 0;
     do{
-        *(buffer++) = tmpn % 10 + 48;
+        if(tmpn < 0){
+            tmpn = abs(tmpn);
+        }
+        *(buffer++) = (tmpn % 10) + 48;
         tmpn /= 10;
     }while(tmpn > 0);
     do{
@@ -284,6 +300,7 @@ int printdc(int num){
         num /= 10;
         tmp = free(2);
     }while(*buffer);
+    free(512);
 }
 /*
 int printdc(int num){
@@ -367,14 +384,6 @@ int testPrint( void ){
     }
     update_cursor(xpos, ypos);
 }
-int wait(int time){
-    for(int i = 0; i < time; i++){
-        for(int j = 0; j < 100000; j++){
-            asm volatile("nop");
-        }
-    }
-    return 0;
-}
 
 float f_pow(int base, int exp){
     float res = 1;
@@ -452,6 +461,7 @@ void toHex(int num, char* str){
     while(*str1){
         *str++ = *str1--;
     }
+    free(16);
 }
 
 // char **splitss(char *str){

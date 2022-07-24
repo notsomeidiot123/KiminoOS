@@ -5,7 +5,6 @@
 #include "../headers/CLIOS.h"
 #include "../headers/idt.h"
 extern const char a20_on;
-const int *memory = 0x7e00;
 
 
 extern int main( void ){
@@ -27,7 +26,9 @@ extern int main( void ){
         print("DONE\n", 0);
     }
     print("Starting Keyboard Driver:\t", 0);
-    irq_install_handler(1, *keyboard_handler);
+    irq_install_handler(0, timer_handler);
+    irq_install_handler(1, keyboard_handler);
+    
     stdin = malloc(512); //beginning amount to allocate to stdin
     print("DONE\n", 0);
     print("Starting Disk...\t", 0);
@@ -35,15 +36,13 @@ extern int main( void ){
     kprint("DONE\n");
     showOutp = 1;
     char *buffer = malloc(512);
-    kLBAread(boot_drive.lba_max_address-1,1, 0, buffer, &boot_drive);
-    int i = 0;
-    while(i != 511){
-        printdc(buffer[i++]);
-        kprint(" ");
-    }
-    kprint("\n");
-    if(strmatch(buffer, "ENDKERNEL")){
-        kprint("found");
+    kLBAread(1, 1, 0, buffer, &boot_drive);
+    printdc(strmatch(buffer, "KIMINOFS"));
+    putc('\n');
+    for(int i = 0; i < 512; i++){
+        if(buffer[i] > 31 && buffer[i] < 127){
+            putc(buffer[i]);
+        }
     }
     kprint("\n");
     shell_init();

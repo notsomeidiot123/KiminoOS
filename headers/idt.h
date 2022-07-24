@@ -96,15 +96,15 @@ void irq_remap(void)
 	outb(0xA1, 0x02);
 	outb(0x21, 0x01);
 	outb(0xA1, 0x01);
-	outb(0x21, 0x0);
-	outb(0xA1, 0x0);
+	outb(0x21, 0x00);
+	outb(0xA1, 0x00);
 }
 void *irq_routines[16] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0
 };
-char currentInterrupt;
+char currentInterrupt = -1;
 extern void _irq_handler(registers *r)
 {
 	currentInterrupt = r -> int_no;
@@ -265,8 +265,8 @@ void IDT_INIT(){
 	SetGateIDT(45, (unsigned)irq13, 0x08, 0x8E);
 	SetGateIDT(46, (unsigned)irq14, 0x08, 0x8E);
 	SetGateIDT(47, (unsigned)irq15, 0x08, 0x8E);
-    outb(0x21, 0xfd);
-    outb(0xa1, 0xff);
+    outb(0x21, 0);
+    outb(0xa1, 0);
     asm("sti");
     //irqs
     //SetGateIDT

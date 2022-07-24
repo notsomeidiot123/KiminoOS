@@ -2,6 +2,7 @@
 #include "../shell/shell.h"
 #include "../CLIOS.h"
 #pragma once
+
 const char *scancodes[128] = {
     0, "\e","1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
     "-", "=", "\b", "\t", "q", "w", "e", "r", "t", "y",
@@ -46,6 +47,10 @@ void keyboard_handler(registers *r){
         }
     }else{
         switch(scancode){
+            case 16:
+                for(int i = 0; i < 4; i++){
+                    stdin[stdindex++] = ' ';
+                }
             case 0x38:
                 break;
             case 0x1d:
@@ -76,15 +81,28 @@ void keyboard_handler(registers *r){
             case 0xe:
                 if(stdindex > 0){
                     if(ctrlpressed){
-                        while(stdin[stdindex] != ' ' || stdin[stdindex] != 0 || stdindex != 0){
+                        while(stdin[stdindex] != ' ' || stdin[stdindex] != 0 || stdindex != 0 || stdin[stdindex] == '\t'){
                             stdin[stdindex--] = 0;
                             delkey();
-                            if(stdin[stdindex] == ' ' || stdin[stdindex] == 0 || stdindex == 0) break;
+                            if(stdin[stdindex] == ' ' || stdin[stdindex] == 0 || stdindex == 0 || stdin[stdindex] == '\t') break;
                         }
                     }
                     else{
-                        stdin[stdindex--] = 0;
-                        delkey();
+                        int swp = stdin[--stdindex];
+                        if(swp == '\t'){
+                            if(stdindex == 1){
+                                for(int i = 0; i < 4; i++);
+                                delkey();
+                            }
+                            for(int i = 4; i > 0 ; i--){
+                                delkey();
+                            }
+                            delkey();
+                        }
+                        else {
+                            delkey();
+                        }
+                        stdin[stdindex] = 0;
                     }
                 }
                 break;
@@ -172,4 +190,5 @@ void keyboard_handler(registers *r){
             }
         }
     }
+    return;
 }

@@ -18,6 +18,8 @@ Set_Stack:
     mov ds, ax
     mov es, ax
     mov sp, 0x8000
+
+    call getMemoryMap
 Boot:
     mov ah, 0x00
     mov al, 0x3
@@ -27,13 +29,14 @@ Boot:
     mov ah, 0x02
     mov al, 0x36 ;0x36 sectors
     mov ch, 0    ;cylinder 0
-    mov cl, 0x02 ;sector 0
+    mov cl, 0x03 ;sector 2
     mov dh, 0   ;head 0
     mov dl, [BootDisc] ;disk 0
     mov es, bx
     mov bx, KERNEL
     int 13h
     ; call detect_mem
+    
     ProtectedStart:
     cli
     lgdt[GDTDESC]
@@ -68,7 +71,8 @@ GDTDESC:
     dd GDTSTART
 CODE equ codedesc - GDTSTART
 DATA equ datadesc - GDTSTART
-; %include "Assembly/bootutils.s"
+%include "Assembly/bootutils.s"
+Extended_Memory_Size: db 0, 0
 [bits 32]
 Protectedmode:
     mov eax, 0
@@ -76,7 +80,6 @@ Protectedmode:
     mov ecx, 0
     cmp dl, [BootDisc]
     
-    ;call detect_mem
     je check_a20
 jmp $
 check_a20:
@@ -92,11 +95,15 @@ check_a20:
     je a20_off
     ; call detect_mem
     mov byte cx, 1
+    mov ax, [Extended_Size_1]
+    mov bx, [Extended_Size_2]
     jmp KERNEL
     jmp $
 a20_off:
     ; call detect_mem
     mov byte cx, 0
+    mov ax, [Extended_Size_1]
+    mov bx, [Extended_Size_2]
     jmp KERNEL
     jmp $
 jmp $

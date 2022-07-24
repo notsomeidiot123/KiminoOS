@@ -1,7 +1,7 @@
 detect_mem:
     pushad
     clc
-    mov eax, 0x7e00
+    mov eax, ebp
     mov es, eax
     mov byte di, 0
 
@@ -30,17 +30,17 @@ detect_mem:
     int 0x15
 
     ; it's not c, dummy
-    ; looop:
-    ;     ;cmp cl, 24
-    ;     cmp ebx, 0
-    ;     je return
-    ;     inc di
-    ;     mov eax, 0xe820
-    ;     mov ecx, 24
-    ;     int 0x15
-    ;     jc error
-    ;     jmp looop
-    ; int 0x15
+    looop:
+        ;cmp cl, 24
+        cmp ebx, 0
+        je return
+        inc di
+        mov eax, 0xe820
+        mov ecx, 24
+        int 0x15
+        jc error
+        jmp looop
+    int 0x15
     jc error
 
     jmp return
@@ -65,3 +65,33 @@ prints:
         jmp prloop
     endpr:
         ret
+
+Extended_Size_1: db 0, 0
+Extended_Size_2: db 0, 0
+
+
+getMemoryMap:
+    clc
+    int 0x12
+    jc ERROR
+    
+
+    xor cx, cx
+    xor dx, dx
+    mov ax, 0xe801
+    int 0x15
+    jc ERROR
+    cmp ah, 0x86
+    je ERROR
+    cmp ah, 0x80
+    je ERROR
+    ;test ax, ax
+    ;je ERROR
+    
+    mov [Extended_Size_1], cx
+    mov [Extended_Size_2], dx
+    
+
+    ret
+ERROR:
+    ret

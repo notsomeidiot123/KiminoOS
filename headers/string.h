@@ -101,3 +101,13 @@ void n_strcpy(char *src, char *dest){
         *(dest + i) = *(src + i);
     }
 }
+void strcap(char *src, char *dest, int offset){
+    dest += offset;
+    while(*src){
+        *(dest++) = *(src++);
+    }
+    return;
+}
+void strcat(char *src, char *dest){
+    
+}

@@ -109,9 +109,11 @@ int start_disk(DRIVE *drive){
         if(data_buffer[83] & 0x200){
             Address_Mode = 2;
         }
-        if(data_buffer[60] && data_buffer[61]){
-            drive->lba_max_address = data_buffer[60] | data_buffer[61] << 16;
-        }
+        drive->lba_max_address = data_buffer[60] | data_buffer[61] << 16;
+            if(drive->lba_max_address == 0){
+                kprint("\nLBA48\n");
+                drive->lba_max_address = data_buffer[100] | data_buffer[101] << 16 | data_buffer[102] << 32 | data_buffer[103] << 48;
+            }
         if(data_buffer[106] & 12){
             drive->lba_sector_size = data_buffer[118];
         }
@@ -123,6 +125,7 @@ int start_disk(DRIVE *drive){
         if(inb(ERROR_REGISTER)){
             return DRIVE_ERROR;
         }
+        free(sizeof(uint16_t) * 256);
     }
     return 0;
 }
@@ -166,6 +169,7 @@ char kLBAwrite(int address, char *data, char driveNum, int sec_count, DRIVE *dri
     }
     outb(COMMAND_REGISTER, 0xE7); // clear buffer
     Drive_Error_Handler();
+    free(512 * sec_count);
 }
 char kLBAread(int address, int size, char driveNum, uint16_t *bufferAddr, DRIVE *drive){
     //check status
